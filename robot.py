@@ -1,4 +1,8 @@
-class Robot:
+from abc import ABC, abstractmethod
+
+class Robot(ABC):
+    manufacturer = "Blitz"
+    population = 0
 
     def __init__(self, name, battery= 100):
         self.name = name
@@ -18,3 +22,7 @@ class Robot:
 
     def __repr__(self):
         return f"{self._class__.__name__}(name+{self.name!r}, battery+{self.battery})"
+
+    @abstractmethod
+    def perform_task(self):
+        pass
