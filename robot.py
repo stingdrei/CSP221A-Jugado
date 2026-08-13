@@ -26,3 +26,35 @@ class Robot(ABC):
     @abstractmethod
     def perform_task(self):
         pass
+
+class DeliveryRobot(Robot):
+    def __init__(self, name, battery=100, max_package_weight=10):
+        super().__init__(name, battery)
+        self.max_package_weight = max_package_weight  # in kg
+
+    def perform_task(self):
+        cost = 15
+        self.battery -= cost
+        return f"{self.name} delivers a package (up to {self.max_package_weight}kg). Battery used: {cost}%"
+
+
+class SecurityRobot(Robot):
+    def __init__(self, name, battery=100, patrol_radius=50):
+        super().__init__(name, battery)
+        self.patrol_radius = patrol_radius  # in meters
+
+    def perform_task(self):
+        cost = 8
+        self.battery -= cost
+        return f"{self.name} patrols a {self.patrol_radius}m radius. Battery used: {cost}%"
+
+
+class CookingRobot(Robot):
+    def __init__(self, name, battery=100, recipe_count=20):
+        super().__init__(name, battery)
+        self.recipe_count = recipe_count  # number of recipes it knows
+
+    def perform_task(self):
+        cost = 20
+        self.battery -= cost
+        return f"{self.name} cooks a meal from its {self.recipe_count}-recipe repertoire. Battery used: {cost}%"
