@@ -4,7 +4,7 @@ class Robot(ABC):
     manufacturer = "Blitz"
     population = 0
 
-    def __init__(self, name, battery= 100):
+    def __init__(self, name, battery=100):
         self.name = name
         self.battery = battery
         Robot.population += 1
@@ -21,7 +21,7 @@ class Robot(ABC):
         return f"{self.name} ({self.battery}% battery)"
 
     def __repr__(self):
-        return f"{self._class__.__name__}(name+{self.name!r}, battery+{self.battery})"
+        return f"{self.__class__.__name__}(name={self.name!r}, battery={self.battery})"
 
     @abstractmethod
     def perform_task(self):
