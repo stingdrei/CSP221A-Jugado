@@ -41,6 +41,10 @@ class Robot(ABC):
         if amount > self.battery:
             raise InsufficientBatteryError(self.name, amount, self.battery)
         self.battery -= amount
+
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
         
     def __str__(self):
         return f"{self.name} ({self.battery}% battery)"
@@ -96,4 +100,3 @@ def run_task_safely(robot, **kwargs):
         print(result)
     finally:
         print(f"{robot.name}'s battery is now at {robot.battery}%")
-
