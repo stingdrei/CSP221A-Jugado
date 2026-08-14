@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+import logging
+
+logging.basicConfig(level=logging.INFO)
 class InsufficientBatteryError(Exception):
     def __init__(self, robot_name, required, available):
         self.robot_name = robot_name
