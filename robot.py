@@ -53,8 +53,11 @@ class CookingRobot(Robot):
     def __init__(self, name, battery=100, recipe_count=20):
         super().__init__(name, battery)
         self.recipe_count = recipe_count  # number of recipes it knows
-
     def perform_task(self):
         cost = 20
         self.battery -= cost
         return f"{self.name} cooks a meal from its {self.recipe_count}-recipe repertoire. Battery used: {cost}%"
+
+def fleet_report(robots):
+    for robot in robots:
+        print(str(robot))
