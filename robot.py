@@ -1,5 +1,11 @@
 from abc import ABC, abstractmethod
-
+class InsufficientBatteryError(Exception):
+    def __init__(self, robot_name, required, available):
+        self.robot_name = robot_name
+        self.required = required
+        self.available = available
+        message = f"{robot_name} needs {required}% battery for this task but only has {available}%."
+        super().__init__(message)
 class Robot(ABC):
     manufacturer = "Blitz"
     population = 0
@@ -17,6 +23,11 @@ class Robot(ABC):
     def battery(self, value):
         self._battery = max(0, min(100, value))
 
+    def use_battery(self, amount):
+        if amount > self.battery:
+            raise InsufficientBatteryError(self.name, amount, self.battery)
+        self.battery -= amount
+        
     def __str__(self):
         return f"{self.name} ({self.battery}% battery)"
 
@@ -34,7 +45,7 @@ class DeliveryRobot(Robot):
 
     def perform_task(self):
         cost = 15
-        self.battery -= cost
+        self.use_battery(cost)
         return f"{self.name} delivers a package (up to {self.max_package_weight}kg). Battery used: {cost}%"
 
 
@@ -45,7 +56,7 @@ class SecurityRobot(Robot):
 
     def perform_task(self):
         cost = 8
-        self.battery -= cost
+        self.use_battery(cost)
         return f"{self.name} patrols a {self.patrol_radius}m radius. Battery used: {cost}%"
 
 
@@ -55,7 +66,7 @@ class CookingRobot(Robot):
         self.recipe_count = recipe_count  # number of recipes it knows
     def perform_task(self):
         cost = 20
-        self.battery -= cost
+        self.use_battery(cost)
         return f"{self.name} cooks a meal from its {self.recipe_count}-recipe repertoire. Battery used: {cost}%"
 
 def fleet_report(robots):
