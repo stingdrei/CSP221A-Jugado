@@ -1,4 +1,17 @@
 from abc import ABC, abstractmethod
+import logging
+
+logging.basicConfig(level=logging.INFO)
+import functools
+
+def log_action(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        logging.info(f"{self.name} is starting {func.__name__}")
+        result = func(self, *args, **kwargs)
+        logging.info(f"{self.name} finished {func.__name__}")
+        return result
+    return wrapper
 class InsufficientBatteryError(Exception):
     def __init__(self, robot_name, required, available):
         self.robot_name = robot_name
@@ -43,11 +56,11 @@ class DeliveryRobot(Robot):
         super().__init__(name, battery)
         self.max_package_weight = max_package_weight  # in kg
 
+    @log_action
     def perform_task(self):
         cost = 15
         self.use_battery(cost)
         return f"{self.name} delivers a package (up to {self.max_package_weight}kg). Battery used: {cost}%"
-
 
 class SecurityRobot(Robot):
     def __init__(self, name, battery=100, patrol_radius=50):
@@ -82,3 +95,4 @@ def run_task_safely(robot, **kwargs):
         print(result)
     finally:
         print(f"{robot.name}'s battery is now at {robot.battery}%")
+
