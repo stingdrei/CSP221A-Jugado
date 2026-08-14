@@ -20,6 +20,7 @@ class InsufficientBatteryError(Exception):
         self.available = available
         message = f"{robot_name} needs {required}% battery for this task but only has {available}%."
         super().__init__(message)
+
 class Robot(ABC):
     manufacturer = "Blitz"
     population = 0
@@ -45,7 +46,7 @@ class Robot(ABC):
     @classmethod
     def from_config(cls, config):
         return cls(**config)
-        
+
     def __str__(self):
         return f"{self.name} ({self.battery}% battery)"
 
@@ -82,6 +83,7 @@ class CookingRobot(Robot):
     def __init__(self, name, battery=100, recipe_count=20):
         super().__init__(name, battery)
         self.recipe_count = recipe_count  # number of recipes it knows
+
     def perform_task(self):
         cost = 20
         self.use_battery(cost)
@@ -100,3 +102,53 @@ def run_task_safely(robot, **kwargs):
         print(result)
     finally:
         print(f"{robot.name}'s battery is now at {robot.battery}%")
+
+
+# ============================================================
+# The Mutable Class Attribute Trap/Standalone Demonstration
+# (Not part of the Robot hierarchy, for understanding only)
+# ============================================================
+
+class BuggyPlayer:
+    champion_pool = []  # BUG: shared across every player instance
+
+    def __init__(self, name):
+        self.name = name
+
+    def add_champion(self, champion):
+        self.champion_pool.append(champion)
+
+
+class FixedPlayer:
+    def __init__(self, name):
+        self.name = name
+        self.champion_pool = []  # FIX: created fresh per instance
+
+    def add_champion(self, champion):
+        self.champion_pool.append(champion)
+
+
+if __name__ == "__main__":
+    print("BuggyPlayer demo:")
+    keria = BuggyPlayer("Keria")
+    peyz = BuggyPlayer("Peyz")
+
+    keria.add_champion("Milio")
+    peyz.add_champion("Lucian")
+
+    print("Keria's pool:", keria.champion_pool)  # ['Milio', 'Lucian'] -- leaked!
+    print("Peyz's pool:", peyz.champion_pool)     # ['Milio', 'Lucian'] -- same list
+    print("Same object?", keria.champion_pool is peyz.champion_pool)  # True
+
+    print()
+
+    print("FixedPlayer demo:")
+    keria_fixed = FixedPlayer("Keria")
+    peyz_fixed = FixedPlayer("Peyz")
+
+    keria_fixed.add_champion("Milio")
+    peyz_fixed.add_champion("Lucian")
+
+    print("Keria's pool:", keria_fixed.champion_pool)  # ['Milio']
+    print("Peyz's pool:", peyz_fixed.champion_pool)    # ['Lucian']
+    print("Same object?", keria_fixed.champion_pool is peyz_fixed.champion_pool)  # False
